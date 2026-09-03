@@ -1,27 +1,3 @@
-# gui_hide
-
-#  ___       _ _   
-# |_ _|_ __ (_) |_ 
-#  | || '_ \| | __|
-#  | || | | | | |_ 
-# |___|_| |_|_|\__|
-
-# ------------------
-# Setup env
-# ------------------
-set ::env(STEP) "BACKEND"
-mkdir -p "./db"
-mkdir -p "./out/libs"
-mkdir -p "./reports"
-source $::env(ENV_FLOW_SCRIPTS)scripts/common_proc.tcl
-# # Check
-# stop
-# ------------------
-# Init design
-# ------------------  
-# set_db design_process_node  $::env(TECH_SIZE)
-
-#set_db init_lib_search_path $::env(ENV_INIT_LIB_SEARCH_PATH); # Path will be used for finding libs and lefs
 
 #suspend
 set_db init_netlist_files   $::env(ENV_NETLIST)
@@ -32,7 +8,7 @@ set_db init_mmmc_files      $::env(ENV_MMMC)
 # set_db init_io_file         $::env(IO_FILE) 
 
 read_mmmc                   $::env(ENV_MMMC)
-read_physical -lef 	    $::env(ENV_LEF_FILES)
+read_physical -lef      $::env(ENV_LEF_FILES)
 
 read_netlist                $::env(ENV_NETLIST) \
     -top $::env(ENV_DESIGN)
@@ -40,7 +16,10 @@ init_design
 # ------------------
 # Global net
 # ------------------
-source $::env(ENV_FLOW_SCRIPTS)scripts/globalNetConnect.tcl
+
+connect_global_net VDD -type pg_pin -pin_base_name VDD -inst_base_name *
+connect_global_net VSS -type pg_pin -pin_base_name VSS -inst_base_name *
+
 # ------------------
 # Read the Scan DEF
 # ------------------
@@ -72,8 +51,6 @@ set_db route_design_detail_end_iteration 0
 set_db route_design_with_timing_driven true
 set_db route_design_with_si_driven true
 
-
 if {[info exists ::env(ENV_FLOORPLAN_FILE)]} {
     read_floorplan $::env(ENV_FLOORPLAN_FILE)
 }
-

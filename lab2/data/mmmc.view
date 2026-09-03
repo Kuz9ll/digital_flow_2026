@@ -1,0 +1,36 @@
+
+# ################
+# TYP
+# ################
+set lib_list_typ {}
+
+lappend lib_list_typ  " $::env(PDK_DIR)/IHP_Open_PDK/sg13g2_stdcell/lib/sg13g2_stdcell_typ_1p20V_25C.lib"
+
+create_rc_corner -name typ -temperature {25} -pre_route_res {1} -pre_route_cap {1} -pre_route_clock_res {0} -pre_route_clock_cap {0} -post_route_res {1} -post_route_cap {1} -post_route_cross_cap {1} -post_route_clock_res {0} -post_route_clock_cap {0}
+create_library_set -name typ -timing $lib_list_typ
+create_opcond -name typ -process {1} -voltage {1.20} -temperature {25}
+create_timing_condition -name typ -opcond {typ} -library_sets {typ}
+create_delay_corner -name typ -timing_condition {typ} -rc_corner {typ}
+
+
+# ################
+# MAX
+# ################
+# set lib_list_max {}
+
+# lappend lib_list_max  <PLACEHOLDER>
+
+# create_rc_corner <PLACEHOLDER>
+# create_library_set <PLACEHOLDER>
+# create_opcond <PLACEHOLDER>
+# create_timing_condition <PLACEHOLDER>
+# create_delay_corner <PLACEHOLDER>
+
+# ################
+# FINAL 
+# ################
+
+create_constraint_mode -name func -sdc_files "$::env(ENV_DESIGN_DIR)/sdc/top.sdc"
+create_analysis_view -name typ -constraint_mode {func} -delay_corner {typ}
+set_analysis_view -setup {typ} -hold {typ}
+
