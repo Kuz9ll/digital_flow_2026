@@ -25,19 +25,28 @@ module counter_tb;
         rst_n  = 0;
         enable = 0;
 
-        // Reset
+        $display("========================================");
+        $display("Starting counter test");
+        $display("========================================");
+
+        // ----------------------------------------------------
+        // Test 1: Reset
+        // ----------------------------------------------------
         repeat (2) @(posedge clk);
         @(negedge clk);
 
         if (count !== 8'd0) begin
-            $display("TEST FAILED: reset");
+            $display("[FAILED] Reset: expected count = 0, got %0d", count);
             $finish;
         end
 
-        // Release reset
+        $display("[PASSED] Reset");
+
         rst_n = 1;
 
-        // Check counting
+        // ----------------------------------------------------
+        // Test 2: Counting
+        // ----------------------------------------------------
         enable = 1;
 
         for (int i = 1; i <= 5; i++) begin
@@ -46,14 +55,18 @@ module counter_tb;
 
             if (count !== i) begin
                 $display(
-                    "TEST FAILED: expected count = %0d, got %0d",
+                    "[FAILED] Counting: expected count = %0d, got %0d",
                     i, count
                 );
                 $finish;
             end
         end
 
-        // Check hold
+        $display("[PASSED] Counting with enable = 1");
+
+        // ----------------------------------------------------
+        // Test 3: Hold
+        // ----------------------------------------------------
         enable = 0;
 
         repeat (3) begin
@@ -62,13 +75,18 @@ module counter_tb;
 
             if (count !== 8'd5) begin
                 $display(
-                    "TEST FAILED: counter changed while enable = 0"
+                    "[FAILED] Hold: expected count = 5, got %0d",
+                    count
                 );
                 $finish;
             end
         end
 
-        // Continue counting
+        $display("[PASSED] Hold with enable = 0");
+
+        // ----------------------------------------------------
+        // Test 4: Continue counting
+        // ----------------------------------------------------
         enable = 1;
 
         for (int i = 6; i <= 10; i++) begin
@@ -77,14 +95,22 @@ module counter_tb;
 
             if (count !== i) begin
                 $display(
-                    "TEST FAILED: expected count = %0d, got %0d",
+                    "[FAILED] Continue counting: expected count = %0d, got %0d",
                     i, count
                 );
                 $finish;
             end
         end
 
-        $display("TEST PASSED");
+        $display("[PASSED] Continue counting after hold");
+
+        // ----------------------------------------------------
+        // Test completed
+        // ----------------------------------------------------
+        $display("========================================");
+        $display("ALL TESTS PASSED");
+        $display("========================================");
+
         $finish;
     end
 
