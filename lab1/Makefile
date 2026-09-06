@@ -39,8 +39,9 @@ all: sim
 $(SIM_RUN_DIR) $(SIM_LOG_DIR):
 	mkdir -p $@
 
+# Simulation with GUI
 sim: $(SIM_RUN_DIR) $(SIM_LOG_DIR)
-	@echo "=== Starting Simulation ==="
+	@echo "=== Starting Simulation (GUI) ==="
 	@echo "Top: $(SIM_TOP)"
 	@echo "Files: $(SIM_FILES)"
 	cd $(SIM_RUN_DIR) && \
@@ -48,6 +49,20 @@ sim: $(SIM_RUN_DIR) $(SIM_LOG_DIR)
 		$(SIM_FILES) \
 		-top $(SIM_TOP) \
 		-gui \
+		2>&1 | tee $(SIM_LOG)
+	@echo "=== Simulation Complete ==="
+	@echo "Log saved to: $(SIM_LOG)"
+
+
+# Simulation without GUI
+sim_nogui: $(SIM_RUN_DIR) $(SIM_LOG_DIR)
+	@echo "=== Starting Simulation (No GUI) ==="
+	@echo "Top: $(SIM_TOP)"
+	@echo "Files: $(SIM_FILES)"
+	cd $(SIM_RUN_DIR) && \
+		$(XRUN) $(XRUN_OPTS) \
+		$(SIM_FILES) \
+		-top $(SIM_TOP) \
 		2>&1 | tee $(SIM_LOG)
 	@echo "=== Simulation Complete ==="
 	@echo "Log saved to: $(SIM_LOG)"
@@ -63,4 +78,4 @@ clean:
 	rm -rf *.session *.cmd *.history *.wlf *.vcd
 
 
-.PHONY: all sim clean
+.PHONY: all sim sim_nogui clean
