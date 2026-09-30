@@ -64,7 +64,7 @@ proc step_genus_read_mmmc {} \
 }
 # suspend
 
-proc step_genus_read_2 {args} \
+proc step_genus_init_design {args} \
 {
    init_design
    check_timing_intent      > $::env(GENUS_RUN_DIR)/check_timing_intent.rpt
@@ -143,7 +143,7 @@ proc step_genus_global_options {} \
 
 
 
-proc step_genus_read_1 {} \
+proc step_genus_elaborate {} \
 {
     elaborate $::env(ENV_DESIGN)
     check_design -unresolved  > $::env(GENUS_RUN_DIR)/check_design.rpt 
