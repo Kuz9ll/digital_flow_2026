@@ -42,6 +42,7 @@ export LEC_FILE  = $(GENUS_OUTPUT_DIR)/rtl2final.lec.do
 # ============================================================
 export TECH_SIZE            = 130
 export ENV_NETLIST          = $(GENUS_OUTPUT_DIR)/syn_opt/$(ENV_DESIGN).v 
+export ENV_FLOORPLAN_FILE   = $(ENV_DESIGN_DIR)/floorplan/counter.fp
 export ENV_LEF_FILES        = $(PDK_DIR)/IHP_Open_PDK/sg13g2_stdcell/lef/sg13g2_tech.lef $(PDK_DIR)/IHP_Open_PDK/sg13g2_stdcell/lef/sg13g2_stdcell.lef
 export ENV_POWER_NETS       = VDD
 export ENV_GROUND_NETS      = VSS

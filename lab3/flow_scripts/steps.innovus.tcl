@@ -23,39 +23,52 @@ proc user_init_design {} \
 
 }
 
-
-proc user_read_floorplan {} \
-{
-    # ------------------
-    # Floorplan  from ENV_INNOVUS_FP (new Makefile var)
-    # ------------------
+proc user_read_floorplan {} {
+    # ----------------------------------------------------------
+    # Floorplan file áåð¸ì èç ENV_FLOORPLAN_FILE (ñì. Makefile)
+    # ENV_INNOVUS_FP  ýòî èìÿ çàïóñêàåìîé óòèëèòû, ÍÅ ôàéë floorplan
+    # ----------------------------------------------------------
     set fp_file ""
-    if {[info exists ::env(ENV_INNOVUS_FP)] && $::env(ENV_INNOVUS_FP) ne ""} {
-        set fp_file $::env(ENV_INNOVUS_FP)
-    } elseif {[info exists ::env(ENV_FLOORPLAN_FILE)] && $::env(ENV_FLOORPLAN_FILE) ne ""} {
+
+    if {[info exists ::env(ENV_FLOORPLAN_FILE)] && $::env(ENV_FLOORPLAN_FILE) ne ""} {
         set fp_file $::env(ENV_FLOORPLAN_FILE)
     }
 
-    if {$fp_file ne ""} {
-        if {[file exists $fp_file]} {
-            read_floorplan $fp_file
-            file copy -force $fp_file ./in
-            if {[file exists "${fp_file}.spr"]} {
-                file copy -force "${fp_file}.spr" ./in
-            }
-        } else {
-            puts "WARN: floorplan file not found: $fp_file"
-        }
+    if {$fp_file eq ""} {
+        puts "WARN: ENV_FLOORPLAN_FILE is not set, skip read_floorplan"
+        return
     }
 
+    if {![file exists $fp_file]} {
+        puts "WARN: floorplan file not found: $fp_file"
+        return
+    }
 
+    # ×èòàåì floorplan
+    read_floorplan $fp_file
+
+    # Êîïèðóåì èñõîäíûé .fp è åãî .spr (åñëè åñòü) â ./in
+    if {![file exists ./in]} {
+        file mkdir ./in
+    }
+
+    file copy -force $fp_file ./in
+    puts "INFO: copied floorplan  -> ./in/[file tail $fp_file]"
+
+    set spr_file "${fp_file}.spr"
+    if {[file exists $spr_file]} {
+        file copy -force $spr_file ./in
+        puts "INFO: copied floorplan  -> ./in/[file tail $spr_file]"
+    }
 }
 
 
 proc global_net {} \
 {
-    connect_global_net vdd -type pg_pin -pin_base_name vdd -inst_base_name *
-    connect_global_net gnd -type pg_pin -pin_base_name gnd -inst_base_name *
+    connect_global_net VDD -type pg_pin -pin_base_name vdd -inst_base_name *
+    connect_global_net VSS -type pg_pin -pin_base_name gnd -inst_base_name *
+    connect_global_net VSS -type pg_pin -pin_base_name vss -inst_base_name *
+
 
 
 }

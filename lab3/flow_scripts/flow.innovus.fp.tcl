@@ -6,9 +6,8 @@
 
 source $::env(FLOW_DIR)/steps.innovus.tcl
 
-#####################################
-### ### ### PLACEHOLDER ### ###  ### 
-#####################################
+
+global_net
 
 gui_show
 gui_fit
