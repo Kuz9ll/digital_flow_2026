@@ -1106,6 +1106,11 @@ source ../flow_scripts/flow.innovus.floorplan.tcl
 
 Rows не вырезайте. Часть рамки может находиться вне core, где rows изначально отсутствуют.
 
+При необходимости используйте опцию -no_cut_by_core
+Пример 
+create_place_blockage -rects {{8781.505 8508.18 8853.829 8601.041}} -type hard -no_cut_by_core
+
+
 ### 7. Проверка результата
 
 Проверьте:
