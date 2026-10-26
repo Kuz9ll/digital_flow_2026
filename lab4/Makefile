@@ -56,16 +56,56 @@ export INNOVUS_FP_LOG         = $(INNOVUS_FP_LOG_DIR)/innovus_fp.log
 export INNOVUS_FP_OPTS        = -stylus
 
 # ============================================================
+# Interactive Innovus (generic)
+# ============================================================
+export ENV_INNOVUS              = innovus
+
+export INNOVUS_RUN_DIR          = $(PWD)/run/innovus
+export INNOVUS_OUTPUT_DIR       = $(INNOVUS_RUN_DIR)/outputs
+export INNOVUS_REPORT_DIR       = $(INNOVUS_RUN_DIR)/reports
+export INNOVUS_LOG_DIR          = $(INNOVUS_RUN_DIR)/logs
+export INNOVUS_OPTS             = -stylus
+
+# ============================================================
+# Innovus Implementation
+# ============================================================
+export ENV_FILLER_CELLS         = sg13g2_decap_4 sg13g2_decap_4 sg13g2_fill_1
+
+export TOP_CTS_LAYER_name        = Metal5
+export TOP_CTS_LAYER_num         = 5
+export BOT_CTS_LAYER_name        = Metal2
+export BOT_CTS_LAYER_num         = 2
+
+export INNOVUS_IMPL_SCRIPT      = $(FLOW_DIR)/flow.innovus.impl.tcl
+export ENV_INNOVUS_IMPL         = innovus
+
+export INNOVUS_IMPL_RUN_DIR     = $(PWD)/run/innovus_impl
+export INNOVUS_IMPL_OUTPUT_DIR  = $(INNOVUS_IMPL_RUN_DIR)/outputs
+export INNOVUS_IMPL_REPORT_DIR  = $(INNOVUS_IMPL_RUN_DIR)/reports
+export INNOVUS_IMPL_LOG_DIR     = $(INNOVUS_IMPL_RUN_DIR)/logs
+export INNOVUS_IMPL_LOG         = $(INNOVUS_IMPL_LOG_DIR)/innovus_impl.log
+export INNOVUS_IMPL_OPTS        = -stylus
+
+
+# ============================================================
+# Innovus Debug
+# ============================================================
+export ENV_DB                   = $(PWD)/run/innovus_impl/db/DB.counter.Route.enc
+export ENV_INNOVUS_DEBUG        = innovus
+export INNOVUS_DEBUG_OPTS       = -stylus
+export INNOVUS_DEBUG_SCRIPT     = $(FLOW_DIR)/flow.innovus.debug.tcl
+
+export INNOVUS_DEBUG_RUN_DIR    = $(PWD)/run/innovus_debug
+export INNOVUS_DEBUG_OUTPUT_DIR = $(INNOVUS_DEBUG_RUN_DIR)/outputs
+export INNOVUS_DEBUG_REPORT_DIR = $(INNOVUS_DEBUG_RUN_DIR)/reports
+export INNOVUS_DEBUG_LOG_DIR    = $(INNOVUS_DEBUG_RUN_DIR)/logs
+
+
+# ============================================================
 # Targets
 # ============================================================
 
-all: genus.syn
-
-# ----------------------------------------
-# Synthesis
-# ----------------------------------------
-$(GENUS_OUTPUT_DIR) $(GENUS_REPORT_DIR) $(GENUS_LOG_DIR):
-	mkdir -p $@
+all: genus
 
 # ----------------------------------------
 # Interactive Genus (empty)
@@ -77,14 +117,6 @@ genus: $(GENUS_RUN_DIR)
 	@echo "=== Starting Interactive Genus ==="
 	cd $(GENUS_RUN_DIR) && $(GENUS) $(GENUS_OPTS)
 
-genus.syn: $(GENUS_OUTPUT_DIR) $(GENUS_REPORT_DIR) $(GENUS_LOG_DIR)
-	@echo "=== Starting Synthesis ==="
-	@echo "Design: $(ENV_DESIGN)"
-	@echo "RTL list: $(ENV_RTL_LIST)"
-	cd $(GENUS_RUN_DIR) && $(GENUS) $(GENUS_OPTS) -files $(GENUS_SCRIPT) 2>&1 | tee $(GENUS_LOG)
-	@echo "=== Synthesis Complete ==="
-	@echo "Log saved to: $(GENUS_LOG)"
-
 # ----------------------------------------
 # LEC (Conformal)
 # ----------------------------------------
@@ -94,12 +126,8 @@ lec: $(GENUS_RUN_DIR)
 	@echo "Script: $(LEC_FILE)"
 	cd $(GENUS_RUN_DIR) && $(LEC) $(LEC_OPTS) -Dofile $(LEC_FILE)
 
-lec_nogui: $(GENUS_RUN_DIR)
-	@echo "=== Starting LEC (no GUI) ==="
-	cd $(GENUS_RUN_DIR) && $(LEC) -NOgui $(LEC_OPTS) -Dofile $(LEC_FILE)
-
 # ----------------------------------------
-# Innovus Floorplan
+# Interactive Innovus Floorplan
 # ----------------------------------------
 $(INNOVUS_FP_OUTPUT_DIR) $(INNOVUS_FP_REPORT_DIR) $(INNOVUS_FP_LOG_DIR):
 	mkdir -p $@
@@ -107,8 +135,8 @@ $(INNOVUS_FP_OUTPUT_DIR) $(INNOVUS_FP_REPORT_DIR) $(INNOVUS_FP_LOG_DIR):
 $(INNOVUS_FP_RUN_DIR): $(INNOVUS_FP_OUTPUT_DIR) $(INNOVUS_FP_REPORT_DIR) $(INNOVUS_FP_LOG_DIR)
 	mkdir -p $@
 
-innovus.fp: $(INNOVUS_FP_RUN_DIR)
-	@echo "=== Starting Innovus Floorplan ==="
+innovus.fp.gui: $(INNOVUS_FP_RUN_DIR)
+	@echo "=== Starting Interactive Innovus Floorplan ==="
 	@echo "Design:     $(ENV_DESIGN)"
 	@echo "Netlist:    $(ENV_NETLIST)"
 	@echo "Tech size:  $(TECH_SIZE)"
@@ -116,21 +144,67 @@ innovus.fp: $(INNOVUS_FP_RUN_DIR)
 	@echo "Power nets: $(ENV_POWER_NETS)"
 	@echo "Ground nets:$(ENV_GROUND_NETS)"
 	@echo "MMMC:       $(ENV_MMMC)"
-	cd $(INNOVUS_FP_RUN_DIR) && $(ENV_INNOVUS_FP) -no_gui $(INNOVUS_FP_OPTS) \
-		-files $(INNOVUS_FP_SCRIPT) 2>&1 | tee $(INNOVUS_FP_LOG)
-	@echo "=== Innovus Floorplan Complete ==="
-	@echo "Log saved to: $(INNOVUS_FP_LOG)"
+	cd $(INNOVUS_FP_RUN_DIR) && $(ENV_INNOVUS_FP) $(INNOVUS_FP_OPTS) \
+		-files $(INNOVUS_FP_SCRIPT)
 
 # ----------------------------------------
 # Interactive Innovus
 # ----------------------------------------
-innovus: $(INNOVUS_FP_RUN_DIR)
+$(INNOVUS_OUTPUT_DIR) $(INNOVUS_REPORT_DIR) $(INNOVUS_LOG_DIR):
+	mkdir -p $@
+
+$(INNOVUS_RUN_DIR): $(INNOVUS_OUTPUT_DIR) $(INNOVUS_REPORT_DIR) $(INNOVUS_LOG_DIR)
+	mkdir -p $@
+
+innovus: $(INNOVUS_RUN_DIR)
 	@echo "=== Starting Interactive Innovus ==="
-	cd $(INNOVUS_FP_RUN_DIR) && $(ENV_INNOVUS_FP) $(INNOVUS_FP_OPTS)
+	cd $(INNOVUS_RUN_DIR) && $(ENV_INNOVUS) $(INNOVUS_OPTS)
+
+# ----------------------------------------
+# Interactive Innovus Implementation
+# ----------------------------------------
+$(INNOVUS_IMPL_OUTPUT_DIR) $(INNOVUS_IMPL_REPORT_DIR) $(INNOVUS_IMPL_LOG_DIR):
+	mkdir -p $@
+
+$(INNOVUS_IMPL_RUN_DIR): $(INNOVUS_IMPL_OUTPUT_DIR) $(INNOVUS_IMPL_REPORT_DIR) $(INNOVUS_IMPL_LOG_DIR)
+	mkdir -p $@
+
+innovus.impl: $(INNOVUS_IMPL_RUN_DIR)
+	@echo "=== Starting Interactive Innovus Implementation ==="
+	@echo "Design:     $(ENV_DESIGN)"
+	@echo "Netlist:    $(ENV_NETLIST)"
+	@echo "Tech size:  $(TECH_SIZE)"
+	@echo "LEF files:  $(ENV_LEF_FILES)"
+	@echo "Power nets: $(ENV_POWER_NETS)"
+	@echo "Ground nets:$(ENV_GROUND_NETS)"
+	@echo "MMMC:       $(ENV_MMMC)"
+	cd $(INNOVUS_IMPL_RUN_DIR) && $(ENV_INNOVUS_IMPL) $(INNOVUS_IMPL_OPTS) \
+		-files $(INNOVUS_IMPL_SCRIPT)
+
+# ----------------------------------------
+# Innovus Debug (open impl DB interactively)
+# ----------------------------------------
+$(INNOVUS_DEBUG_OUTPUT_DIR) $(INNOVUS_DEBUG_REPORT_DIR) $(INNOVUS_DEBUG_LOG_DIR):
+	mkdir -p $@
+
+$(INNOVUS_DEBUG_RUN_DIR): $(INNOVUS_DEBUG_OUTPUT_DIR) $(INNOVUS_DEBUG_REPORT_DIR) $(INNOVUS_DEBUG_LOG_DIR)
+	mkdir -p $@
+
+innovus.debug: $(INNOVUS_DEBUG_RUN_DIR)
+	@echo "=== Starting Innovus Debug ==="
+	@echo "Run dir: $(INNOVUS_DEBUG_RUN_DIR)"
+	@echo "DB:      $(ENV_DB)"
+	@echo "Script:  $(INNOVUS_DEBUG_SCRIPT)"
+	@test -e $(ENV_DB) || { echo "ERROR: DB not found: $(ENV_DB)"; exit 1; }
+	cd $(INNOVUS_DEBUG_RUN_DIR) && $(ENV_INNOVUS_DEBUG) $(INNOVUS_DEBUG_OPTS) \
+		-files $(INNOVUS_DEBUG_SCRIPT)
 
 clean:
 	rm -rf $(GENUS_LOG_DIR) $(GENUS_REPORT_DIR) $(GENUS_OUTPUT_DIR) $(GENUS_RUN_DIR) \
 	       $(INNOVUS_FP_LOG_DIR) $(INNOVUS_FP_REPORT_DIR) $(INNOVUS_FP_OUTPUT_DIR) $(INNOVUS_FP_RUN_DIR) \
+	       $(INNOVUS_LOG_DIR) $(INNOVUS_REPORT_DIR) $(INNOVUS_OUTPUT_DIR) $(INNOVUS_RUN_DIR) \
+	       $(INNOVUS_IMPL_LOG_DIR) $(INNOVUS_IMPL_REPORT_DIR) $(INNOVUS_IMPL_OUTPUT_DIR) $(INNOVUS_IMPL_RUN_DIR) \
+	       $(INNOVUS_DEBUG_LOG_DIR) $(INNOVUS_DEBUG_REPORT_DIR) $(INNOVUS_DEBUG_OUTPUT_DIR) $(INNOVUS_DEBUG_RUN_DIR) \
 	       *.session *.cmd *.history *.wlf *.vcd
 
-.PHONY: all genus.syn genus lec lec_nogui innovus.fp innovus clean
+.PHONY: all genus lec innovus.fp.gui innovus innovus.impl innovus.debug clean

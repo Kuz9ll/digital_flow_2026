@@ -6,15 +6,6 @@
 
 source $::env(FLOW_DIR)/steps.innovus.tcl
 
-
-global_net
-
-
-
-
-
-
-
 gui_show
 gui_fit
 
