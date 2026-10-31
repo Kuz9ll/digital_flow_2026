@@ -26,7 +26,7 @@ proc user_clock_tree_synthesis {args} \
 
     create_clock_tree_spec -out_file ccopt_default.spec
     source ccopt_default.spec  
-    ccopt_design 
+    clock_opt_design 
 
     # ------------------
     # reports

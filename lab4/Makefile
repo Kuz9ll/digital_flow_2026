@@ -6,7 +6,7 @@ export PDK_DIR                  = $(PWD)/../PDK/
 # ============================================================
 # Design settings
 # ============================================================
-export ENV_DESIGN               = counter
+export ENV_DESIGN               = s13207
 export ENV_DESIGN_DIR           = $(PWD)/data/$(ENV_DESIGN)
 export ENV_MMMC                 = $(ENV_DESIGN_DIR)/mmmc.view
 export ENV_DEFINE               =
@@ -23,7 +23,7 @@ export INNOVUS_FP_SCRIPT        = $(FLOW_DIR)/flow.innovus.fp.tcl
 # ============================================================
 # Genus Synthesis settings
 # ============================================================
-export GENUS_RUN_DIR            = $(PWD)/run/genus
+export GENUS_RUN_DIR            = $(PWD)/run/genus.syn
 export GENUS_OUTPUT_DIR         = $(GENUS_RUN_DIR)/outputs
 export GENUS_REPORT_DIR         = $(GENUS_RUN_DIR)/reports
 export GENUS_LOG_DIR            = $(GENUS_RUN_DIR)/logs
@@ -48,7 +48,7 @@ export LEC_FILE                 = $(GENUS_OUTPUT_DIR)/rtl2final.lec.do
 # ============================================================
 export TECH_SIZE                = 130
 export ENV_NETLIST              = $(GENUS_OUTPUT_DIR)/syn_opt/$(ENV_DESIGN).v
-export ENV_FLOORPLAN_FILE       = $(ENV_DESIGN_DIR)/floorplan/counter.fp
+export ENV_FLOORPLAN_FILE       = $(ENV_DESIGN_DIR)/floorplan/s13207.fp
 export ENV_LEF_FILES            = $(PDK_DIR)/IHP_Open_PDK/sg13g2_stdcell/lef/sg13g2_tech.lef $(PDK_DIR)/IHP_Open_PDK/sg13g2_stdcell/lef/sg13g2_stdcell.lef
 export ENV_POWER_NETS           = VDD
 export ENV_GROUND_NETS          = VSS
@@ -154,7 +154,7 @@ $(INNOVUS_FP_OUTPUT_DIR) $(INNOVUS_FP_REPORT_DIR) $(INNOVUS_FP_LOG_DIR):
 $(INNOVUS_FP_RUN_DIR): $(INNOVUS_FP_OUTPUT_DIR) $(INNOVUS_FP_REPORT_DIR) $(INNOVUS_FP_LOG_DIR)
 	mkdir -p $@
 
-innovus.fp.gui: $(INNOVUS_FP_RUN_DIR)
+innovus.fp: $(INNOVUS_FP_RUN_DIR)
 	@echo "=== Starting Interactive Innovus Floorplan ==="
 	@echo "Design:     $(ENV_DESIGN)"
 	@echo "Netlist:    $(ENV_NETLIST)"
