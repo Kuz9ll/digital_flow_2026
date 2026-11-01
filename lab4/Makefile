@@ -95,7 +95,7 @@ export INNOVUS_IMPL_OPTS        = -stylus
 # ============================================================
 # Innovus Debug
 # ============================================================
-export ENV_DB                   = $(PWD)/run/innovus_impl/db/DB.counter.Route.enc
+export ENV_DB                   = $(PWD)/run/innovus_impl/db/DB.$(ENV_DESIGN_DIR).Route.enc
 export ENV_INNOVUS_DEBUG        = innovus
 export INNOVUS_DEBUG_OPTS       = -stylus
 export INNOVUS_DEBUG_SCRIPT     = $(FLOW_DIR)/flow.innovus.debug.tcl
