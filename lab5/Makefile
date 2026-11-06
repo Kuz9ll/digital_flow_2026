@@ -22,6 +22,7 @@ export INNOVUS_FP_SCRIPT        = $(FLOW_DIR)/flow.innovus.fp.tcl
 export VOLTUS_PGV_SCRIPT        = $(FLOW_DIR)/flow.voltus.pgv.tcl
 export VOLTUS_STATIC_SCRIPT     = $(FLOW_DIR)/flow.voltus.static.tcl
 export VOLTUS_DYNAMIC_SCRIPT    = $(FLOW_DIR)/flow.voltus.dynamic.tcl
+export VOLTUS_GUI_SCRIPT        = $(FLOW_DIR)/flow.voltus.gui.tcl
 
 # ============================================================
 # Genus Synthesis settings
@@ -125,6 +126,7 @@ export VOLTUS_LOG               = $(VOLTUS_LOG_DIR)/voltus.log
 export VOLTUS_PGV_LOG           = $(VOLTUS_LOG_DIR)/voltus_pgv.log
 export VOLTUS_STATIC_LOG        = $(VOLTUS_LOG_DIR)/voltus_static.log
 export VOLTUS_DYNAMIC_LOG       = $(VOLTUS_LOG_DIR)/voltus_dynamic.log
+export VOLTUS_GUI_LOG           = $(VOLTUS_LOG_DIR)/voltus_gui.log
 
 # This path matches PGV_DIR/PGV_FILE in the flat Tcl scripts.
 export VOLTUS_PGV_LIBRARY       = $(VOLTUS_OUTPUT_DIR)/pgv/tech_pgv/techonly.cl
@@ -297,6 +299,18 @@ voltus.dynamic: $(VOLTUS_RUN_DIR)
 		-init "$(VOLTUS_DYNAMIC_SCRIPT)"
 
 # ----------------------------------------
+# Voltus GUI (view saved results)
+# ----------------------------------------
+voltus.gui: $(VOLTUS_RUN_DIR)
+	@echo "=== Starting Voltus Results Viewer ==="
+	@echo "Run dir: $(VOLTUS_RUN_DIR)"
+	@echo "Script:  $(VOLTUS_GUI_SCRIPT)"
+	@test -f "$(VOLTUS_GUI_SCRIPT)" || { echo "ERROR: Script not found: $(VOLTUS_GUI_SCRIPT)"; exit 1; }
+	cd "$(VOLTUS_RUN_DIR)" && $(ENV_VOLTUS) $(VOLTUS_OPTS) \
+		-log "$(VOLTUS_GUI_LOG)" \
+		-init "$(VOLTUS_GUI_SCRIPT)"
+
+# ----------------------------------------
 # Clean
 # ----------------------------------------
 clean:
@@ -310,4 +324,4 @@ clean:
 	       *.session *.cmd *.history *.wlf *.vcd
 
 .PHONY: all genus genus.syn lec innovus.fp innovus innovus.impl innovus.debug \
-        voltus voltus.pgv voltus.static voltus.dynamic clean
+        voltus voltus.pgv voltus.static voltus.dynamic voltus.gui clean
