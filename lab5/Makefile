@@ -8,7 +8,7 @@ export PDK_DIR                  = $(PWD)/../PDK/
 # ============================================================
 export ENV_DESIGN               = s13207
 export ENV_DESIGN_DIR           = $(PWD)/data/$(ENV_DESIGN)
-export ENV_MMMC                 = $(ENV_DESIGN_DIR)/mmmc.view
+export ENV_MMMC                 = $(ENV_DESIGN_DIR)/mmmc_45Gate.view
 export ENV_DEFINE               =
 export ENV_INIT_HDL_SEARCH_PATH = ${ENV_DESIGN_DIR}
 export ENV_RTL_LIST             = $(ENV_DESIGN_DIR)/$(ENV_DESIGN).lst
@@ -50,10 +50,10 @@ export LEC_FILE                 = $(GENUS_OUTPUT_DIR)/rtl2final.lec.do
 # ============================================================
 # Innovus Floorplan settings
 # ============================================================
-export TECH_SIZE                = 130
+export TECH_SIZE                = 45
 export ENV_NETLIST              = $(GENUS_OUTPUT_DIR)/syn_opt/$(ENV_DESIGN).v
-export ENV_FLOORPLAN_FILE       = $(ENV_DESIGN_DIR)/floorplan/s13207.fp
-export ENV_LEF_FILES            = $(PDK_DIR)/IHP_Open_PDK/sg13g2_stdcell/lef/sg13g2_tech.lef $(PDK_DIR)/IHP_Open_PDK/sg13g2_stdcell/lef/sg13g2_stdcell.lef
+export ENV_FLOORPLAN_FILE       = $(ENV_DESIGN_DIR)/floorplan/s13207_45Gate.fp
+export ENV_LEF_FILES            = $(PDK_DIR)/NanGate45/lef/NangateOpenCellLibrary.tech.lef $(PDK_DIR)/NanGate45/lef/NangateOpenCellLibrary.macro.mod.lef
 export ENV_POWER_NETS           = VDD
 export ENV_GROUND_NETS          = VSS
 export ENV_INNOVUS_FP           = innovus
@@ -79,11 +79,11 @@ export INNOVUS_OPTS             = -stylus
 # ============================================================
 # Innovus Implementation
 # ============================================================
-export ENV_FILLER_CELLS         = sg13g2_decap_4 sg13g2_decap_4 sg13g2_fill_1
+export ENV_FILLER_CELLS         = FILLCELL_X1 FILLCELL_X2 FILLCELL_X4 FILLCELL_X8 FILLCELL_X16 FILLCELL_X32
 
-export TOP_CTS_LAYER_name       = Metal5
-export TOP_CTS_LAYER_num        = 5
-export BOT_CTS_LAYER_name       = Metal2
+export TOP_CTS_LAYER_name       = metal9
+export TOP_CTS_LAYER_num        = 9
+export BOT_CTS_LAYER_name       = metal2
 export BOT_CTS_LAYER_num        = 2
 
 export INNOVUS_IMPL_SCRIPT      = $(FLOW_DIR)/flow.innovus.impl.tcl
@@ -130,6 +130,18 @@ export VOLTUS_GUI_LOG           = $(VOLTUS_LOG_DIR)/voltus_gui.log
 
 # This path matches PGV_DIR/PGV_FILE in the flat Tcl scripts.
 export VOLTUS_PGV_LIBRARY       = $(VOLTUS_OUTPUT_DIR)/pgv/tech_pgv/techonly.cl
+
+export QRC_TECH_FILE = $(PDK_DIR)NanGate45/qrc/NG45.tch
+export LEF_LAYER_MAP = $(PDK_DIR)NanGate45/NanGate45_lefdef.layermap
+export VOLTAGE = 1.1
+
+
+export PGV_DIR = ./outputs/pgv/tech_pgv
+export REPORT_DIR = ./reports/pgv
+
+
+
+
 
 # ============================================================
 # Targets

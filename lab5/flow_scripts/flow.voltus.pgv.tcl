@@ -8,42 +8,30 @@
 # ============================================================
 # Исходные данные
 # ============================================================
-set LEF_FILES [list \
-    ../data/lef/gsclib090_tech.lef \
-    ../data/lef/gsclib090_macro.lef \
-    ../data/lef/decap.lef \
-]
 
-set QRC_TECH_FILE ../data/qrc/gpdk090_9l.tch
-set LEF_LAYER_MAP ../data/voltus/lefdef.layermap
-set VOLTAGE 0.9
-
-set PGV_DIR ./outputs/pgv/tech_pgv
-set REPORT_DIR ./reports/pgv
-
-file mkdir $PGV_DIR $REPORT_DIR
+file mkdir $::env(PGV_DIR) $::env(REPORT_DIR)
 
 # ============================================================
 # Чтение LEF: технологический файл первым
 # ============================================================
-read_physical -lef $LEF_FILES
+read_physical -lef $::env(ENV_LEF_FILES)
+# read_def $::env(ENV_DEF)
 
 # ============================================================
 # Настройка technology-only библиотеки
 # ============================================================
 set_pg_library_mode \
     -cell_type techonly \
-    -power_pins [list VDD $VOLTAGE] \
+    -power_pins [list VDD $::env(VOLTAGE)] \
     -ground_pins VSS \
-    -filler_cells {FILL1 FILL2 FILL4 FILL8 FILL16 FILL32 FILL64} \
-    -decap_cells {DECAP1 DECAP2 DECAP4 DECAP8 DECAP16 DECAP32 DECAP64} \
-    -lef_layer_map $LEF_LAYER_MAP \
-    -extraction_tech_file $QRC_TECH_FILE
+    -filler_cells $::env(ENV_FILLER_CELLS) \
+    -lef_layer_map $::env(LEF_LAYER_MAP) \
+    -extraction_tech_file $::env(QRC_TECH_FILE) 
 
 # ============================================================
 # Генерация PGV
 # ============================================================
-write_pg_library -out_dir $PGV_DIR
+write_pg_library -out_dir $::env(PGV_DIR) 
 
 # ============================================================
 # Проверка сгенерированной библиотеки
@@ -51,5 +39,5 @@ write_pg_library -out_dir $PGV_DIR
 check_pg_library \
     -summary \
     -report \
-    -out_dir $REPORT_DIR \
-    $PGV_DIR/techonly.cl
+    -out_dir $::env(REPORT_DIR) \
+    $::env(PGV_DIR)/techonly.cl 
