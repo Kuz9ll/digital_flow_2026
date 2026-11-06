@@ -1,0 +1,25 @@
+# NanGate45 / FreePDK45 - Cadence Voltus LEF/DEF to Quantus technology layer map
+# Provisional 1:1 naming assumption: QRC layer names MUST be verified.
+# Syntax: metal|via <QRC/ICT layer name> lefdef <LEF layer name>
+# Source of LEF layer names: NangateOpenCellLibrary.tech.lef (TILOS MacroPlacement)
+
+metal metal1 lefdef metal1
+metal metal2 lefdef metal2
+metal metal3 lefdef metal3
+metal metal4 lefdef metal4
+metal metal5 lefdef metal5
+metal metal6 lefdef metal6
+metal metal7 lefdef metal7
+metal metal8 lefdef metal8
+metal metal9 lefdef metal9
+metal metal10 lefdef metal10
+
+via via1 lefdef via1
+via via2 lefdef via2
+via via3 lefdef via3
+via via4 lefdef via4
+via via5 lefdef via5
+via via6 lefdef via6
+via via7 lefdef via7
+via via8 lefdef via8
+via via9 lefdef via9
