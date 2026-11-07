@@ -1,41 +1,45 @@
 # ============================================================
-# Voltus 20.10 Common UI: средняя мощность и статический IR drop
+# Voltus 20.10 Common UI static power and IR drop
 # ============================================================
-# Пример для одного постоянно включённого домена VDD/VSS.
-# Запускать в новом сеансе из той же рабочей папки, что и PGV flow.
-# Пути, view, corner, напряжение, температура и активность — примеры.
-# Заменить их значениями своего проекта. MMMC/Liberty/SDC берутся из базы.
+# Example for a single always-on VDD/VSS domain.
+# Run make voltus.static from the project root after make voltus.pgv.
+# The Makefile supplies the settings. The design database supplies MMMC, Liberty, and SDC.
 
 # ============================================================
-# Исходные данные
+# Inputs
 # ============================================================
-set DESIGN_DB ../design/postRoute.enc.dat
-set SPEF_FILE ../design/postRoute.spef.gz
+set DESIGN_DB $::env(VOLTUS_DESIGN_DB)
+set SPEF_FILE $::env(VOLTUS_SPEF_FILE)
 
-set ANALYSIS_VIEW AV_wc_on
-set RC_CORNER RC_wc_125
+set ANALYSIS_VIEW $::env(VOLTUS_ANALYSIS_VIEW)
+set RC_CORNER $::env(VOLTUS_RC_CORNER)
 
-set VOLTAGE 0.9
-set TEMPERATURE 125
+set VOLTAGE $::env(VOLTUS_VOLTAGE)
+set IR_DROP_FRACTION $::env(VOLTUS_IR_DROP_FRACTION)
+set TEMPERATURE $::env(VOLTUS_TEMPERATURE)
 
-set POWER_NET VDD
-set GROUND_NET VSS
+set POWER_NET $::env(VOLTUS_POWER_NET)
+set GROUND_NET $::env(VOLTUS_GROUND_NET)
 
-set PGV_FILE ./outputs/pgv/tech_pgv/techonly.cl
-set VDD_PAD_FILE ../design/VDD.pp
-set VSS_PAD_FILE ../design/VSS.pp
+set PGV_FILE $::env(VOLTUS_PGV_LIBRARY)
+set VDD_PAD_FILE $::env(VOLTUS_VDD_PAD_FILE)
+set VSS_PAD_FILE $::env(VOLTUS_VSS_PAD_FILE)
 
-set INPUT_ACTIVITY 0.2
-set ACTIVITY_PERIOD 8.0
-set CLOCK_GATE_RATIO 0.5
+set INPUT_ACTIVITY $::env(VOLTUS_INPUT_ACTIVITY)
+set ACTIVITY_PERIOD $::env(VOLTUS_ACTIVITY_PERIOD)
+set CLOCK_GATE_RATIO $::env(VOLTUS_CLOCK_GATE_RATIO)
 
-set POWER_DIR ./reports/static_power
-set RAIL_DIR ./reports/static_rail
+set POWER_DIR $::env(VOLTUS_STATIC_POWER_DIR)
+set RAIL_DIR $::env(VOLTUS_STATIC_RAIL_DIR)
+
+if {$ANALYSIS_VIEW eq "" || $RC_CORNER eq ""} {
+    error "Choose VOLTUS_ANALYSIS_VIEW and VOLTUS_RC_CORNER in Makefile."
+}
 
 file mkdir $POWER_DIR $RAIL_DIR
 
 # ============================================================
-# Загрузка проекта и сигнальных паразитных параметров
+# Load the design and signal parasitics
 # ============================================================
 read_db -physical_data $DESIGN_DB
 
@@ -48,7 +52,7 @@ set_power_rail $POWER_NET -power -voltage $VOLTAGE -force
 set_power_rail $GROUND_NET -ground
 
 # ============================================================
-# Расчёт средней мощности и сохранение средних токов
+# Calculate average power and save average currents
 # ============================================================
 set_db power_view $ANALYSIS_VIEW
 set_db power_method static
@@ -62,15 +66,15 @@ set_power_output_dir $POWER_DIR
 set_default_switching_activity -reset
 set_switching_activity -reset
 
-# ACTIVITY_PERIOD — в единицах времени Liberty.
-# Эта настройка нормирует активность и не изменяет clocks в SDC.
+# Use the Liberty time unit for ACTIVITY_PERIOD to normalize switching activity.
+# Clock constraints come from the SDC.
 set_default_switching_activity \
     -input_activity $INPUT_ACTIVITY \
     -period $ACTIVITY_PERIOD \
     -clock_gates_output_ratio $CLOCK_GATE_RATIO
 
-# При наличии reset задайте его неактивное состояние.
-# Пример только для входа rst с активным уровнем 1:
+# If the design has a reset input, set it to its inactive state.
+# The example below applies to an active-high rst input.
 # set_switching_activity -input_port rst -activity 0.0 -duty 0.0
 
 propagate_activity
@@ -78,7 +82,7 @@ propagate_activity
 report_power -out_file static.rpt
 
 # ============================================================
-# Настройка статического анализа сети питания
+# Configure static rail analysis
 # ============================================================
 set_rail_analysis_config \
     -method static \
@@ -91,14 +95,15 @@ set_rail_analysis_config \
 set_pg_nets -net $POWER_NET -voltage $VOLTAGE
 set_pg_nets -net $GROUND_NET -voltage 0.0
 
-# CORE — имя создаваемого домена анализа VDD/VSS.
+# Use CORE as the name of the VDD/VSS analysis domain.
 set_rail_analysis_domain \
     -domain_name CORE \
     -power_nets $POWER_NET \
-    -ground_nets $GROUND_NET
-
+    -ground_nets $GROUND_NET \
+    -threshold $IR_DROP_FRACTION
+# suspend
 # ============================================================
-# Точки подключения идеальных источников питания
+# Set ideal supply source locations
 # ============================================================
 set_power_pads -reset
 
@@ -113,7 +118,7 @@ set_power_pads \
     -file $VSS_PAD_FILE
 
 # ============================================================
-# Загрузка рассчитанных средних токов и запуск IR drop
+# Load average currents and run static rail analysis
 # ============================================================
 set_power_data -reset
 
